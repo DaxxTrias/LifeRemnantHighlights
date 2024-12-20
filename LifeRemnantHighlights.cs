@@ -37,8 +37,12 @@ namespace LifeRemnantHighlights
     public class LifeRemnantHighlightsCore : BaseSettingsPlugin<Settings>
     {
         private readonly Dictionary<long, Entity> _monsterToEffectMap = new();
-        private List<Entity> _unmatchedMonsters = [];
-        private List<Entity> _unmatchedEffects = [];
+        private List<Entity> _unmatchedMonsters = new();
+        private List<Entity> _unmatchedEffects = new();
+        private List<Entity> _cachedMonsters = new();
+        private List<Entity> _cachedEffects = new();
+        private DateTime _lastCacheTime = DateTime.MinValue;
+        private const int CacheDurationMs = 100;
 
         public override void Render()
         {
@@ -74,8 +78,15 @@ namespace LifeRemnantHighlights
 
         private void DrawGrimRemnants()
         {
-            var currentMonsters = GetExposeSoulMonsters();
-            var currentEffects = GetGrimRemnantEffects();
+            if ((DateTime.Now - _lastCacheTime).TotalMilliseconds > CacheDurationMs)
+            {
+                _cachedMonsters = GetExposeSoulMonsters();
+                _cachedEffects = GetGrimRemnantEffects();
+                _lastCacheTime = DateTime.Now;
+            }
+
+            var currentMonsters = _cachedMonsters;
+            var currentEffects = _cachedEffects;
 
             // Clean up pairings if monster/effect invalid or pickup detected
             foreach (var (monsterId, effect) in _monsterToEffectMap.ToList())
@@ -112,7 +123,7 @@ namespace LifeRemnantHighlights
 
                 foreach (var monster in _unmatchedMonsters)
                 {
-                    var dist = Vector3.Distance(effPos, monster.Pos);
+                    var dist = Vector3.DistanceSquared(effPos, monster.Pos);
                     if (!(dist < bestDistance)) continue;
                     
                     bestDistance = dist;
