@@ -7,7 +7,7 @@ using ExileCore2.Shared.Enums;
 using ExileCore2.Shared.Interfaces;
 using ExileCore2.Shared.Nodes;
 
-namespace LifeRemnantHighlights
+namespace RemnantHighlights
 {
     public class Settings : ISettings
     {
@@ -33,7 +33,7 @@ namespace LifeRemnantHighlights
         public ColorNode InfusionRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.Blue);
     }
 
-    public class LifeRemnantHighlightsCore : BaseSettingsPlugin<Settings>
+    public class RemnantHighlightsCore : BaseSettingsPlugin<Settings>
     {
 
         public override void Render()
