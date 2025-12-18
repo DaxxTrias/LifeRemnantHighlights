@@ -16,7 +16,7 @@ namespace LifeRemnantHighlights
         
         
         public ToggleNode LifeRemnantEnable { get; set; } = new ToggleNode(true);
-        public ToggleNode GrimRemnantEnable { get; set; } = new ToggleNode(true);
+        public ToggleNode InfusionRemnantEnable { get; set; } = new ToggleNode(true);
 
         [Menu("Radius", "Radius of the circle.")]
         public RangeNode<int> Radius { get; set; } = new RangeNode<int>(25, 1, 100);
@@ -31,7 +31,7 @@ namespace LifeRemnantHighlights
         public RangeNode<int> AxisOffset { get; set; } = new RangeNode<int>(0, -200, 200);
 
         public ColorNode LifeRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.White);
-        public ColorNode GrimRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.Blue);
+        public ColorNode InfusionRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.Blue);
     }
 
     public class LifeRemnantHighlightsCore : BaseSettingsPlugin<Settings>
@@ -52,8 +52,8 @@ namespace LifeRemnantHighlights
                 DrawLifeRemnants();
             }
             
-            if (Settings.GrimRemnantEnable) {
-                DrawGrimRemnants();
+            if (Settings.InfusionRemnantEnable) {
+                DrawInfusionRemnants();
             }
         }
 
@@ -76,12 +76,12 @@ namespace LifeRemnantHighlights
             }
         }
 
-        private void DrawGrimRemnants()
+        private void DrawInfusionRemnants()
         {
             if ((DateTime.Now - _lastCacheTime).TotalMilliseconds > CacheDurationMs)
             {
                 _cachedMonsters = GetExposeSoulMonsters();
-                _cachedEffects = GetGrimRemnantEffects();
+                _cachedEffects = GetInfusionRemnantEffects();
                 _lastCacheTime = DateTime.Now;
             }
 
@@ -145,7 +145,7 @@ namespace LifeRemnantHighlights
 
                 var pos = monster.Pos;
                 pos.Z += Settings.AxisOffset - 85;
-                Graphics.DrawCircleInWorld(pos, Settings.Radius, Settings.GrimRemnantColor, Settings.Thickness, Settings.Smoothness);
+                Graphics.DrawCircleInWorld(pos, Settings.Radius, Settings.InfusionRemnantColor, Settings.Thickness, Settings.Smoothness);
             }
         }
 
@@ -175,7 +175,7 @@ namespace LifeRemnantHighlights
             return list;
         }
 
-        private List<Entity> GetGrimRemnantEffects()
+        private List<Entity> GetInfusionRemnantEffects()
         {
             var list = new List<Entity>();
             foreach (var entity in GameController.EntityListWrapper.ValidEntitiesByType[EntityType.Effect])
@@ -186,7 +186,7 @@ namespace LifeRemnantHighlights
                 var baseAnimatedObjectEntity = animatedComponent.BaseAnimatedObjectEntity;
                 if (baseAnimatedObjectEntity?.Path == null) continue;
 
-                if (baseAnimatedObjectEntity.Path.Contains("grimFeast"))
+                if (baseAnimatedObjectEntity.Path.Contains("skill_infusion"))
                 {
                     list.Add(entity);
                 }
