@@ -16,6 +16,7 @@ namespace RemnantHighlights
         
         public ToggleNode LifeRemnantEnable { get; set; } = new ToggleNode(true);
         public ToggleNode InfusionRemnantEnable { get; set; } = new ToggleNode(true);
+        public ToggleNode ManaRemnantEnable { get; set; } = new ToggleNode(true);
 
         [Menu("Radius", "Radius of the circle.")]
         public RangeNode<int> Radius { get; set; } = new RangeNode<int>(25, 1, 100);
@@ -31,6 +32,7 @@ namespace RemnantHighlights
 
         public ColorNode LifeRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.White);
         public ColorNode InfusionRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.Blue);
+        public ColorNode ManaRemnantColor { get; set; } = new ColorNode(System.Drawing.Color.Cyan);
     }
 
     public class RemnantHighlightsCore : BaseSettingsPlugin<Settings>
@@ -46,6 +48,10 @@ namespace RemnantHighlights
             
             if (Settings.InfusionRemnantEnable) {
                 DrawInfusionRemnants();
+            }
+            
+            if (Settings.ManaRemnantEnable) {
+                DrawManaRemnants();
             }
         }
 
@@ -87,6 +93,28 @@ namespace RemnantHighlights
                 pos.Z += Settings.AxisOffset;
 
                 Graphics.DrawCircleInWorld(pos, Settings.Radius, Settings.InfusionRemnantColor, Settings.Thickness, Settings.Smoothness);
+            }
+        }
+
+        private void DrawManaRemnants()
+        {
+            foreach (var entity in GameController.EntityListWrapper.ValidEntitiesByType[EntityType.Effect])
+            {
+                var animatedComponent = entity.GetComponent<Animated>();
+                if (animatedComponent == null) continue;
+
+                var baseAnimatedObjectEntity = animatedComponent.BaseAnimatedObjectEntity;
+                if (baseAnimatedObjectEntity == null) continue;
+                
+                var path = baseAnimatedObjectEntity.Path;
+                if (string.IsNullOrEmpty(path)) continue;
+
+                if (!path.Contains("lightning_energyremnants", StringComparison.OrdinalIgnoreCase)) continue;
+
+                var pos = entity.Pos;
+                pos.Z += Settings.AxisOffset;
+
+                Graphics.DrawCircleInWorld(pos, Settings.Radius, Settings.ManaRemnantColor, Settings.Thickness, Settings.Smoothness);
             }
         }
     }
